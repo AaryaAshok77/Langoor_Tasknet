@@ -1,0 +1,60 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+Conversation
+{% endblock %}
+
+{% block content %}
+    <div class="p-6 bg-sky-100 rounded-xl">
+        <button onclick="goBack()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9 p-1 rounded-lg hover:bg-sky-100">
+                <path d="M9.195 18.44c1.25.713 2.805-.19 2.805-1.629v-2.34l6.945 3.968c1.25.714 2.805-.188 2.805-1.628V8.688c0-1.44-1.555-2.342-2.805-1.628L12 11.03v-2.34c0-1.44-1.555-2.343-2.805-1.629l-7.108 4.062c-1.26.72-1.26 2.536 0 3.256l7.108 4.061z" />
+            </svg>              
+        </button>
+        <h1 class="mb-6 text-4xl text-center" style="font-family: Lucida Console;">Conversation: <a href="{% url 'kanban:task_detail' conversation.task.id %}" class="p-1 rounded-xl hover:bg-sky-200">{{conversation.task.title}}</a></h1>
+        <div class="space-y-6">
+            {% for comment in conversation.comments.all %}
+                <div class="p-6 {% if comment.created_by == request.user %}bg-sky-400 mr-40 {% else %}bg-sky-200 ml-40 {% endif %}rounded-xl" style="box-shadow: 5px 5px 10px #8f8f8f;">
+                    <div>
+                        <p class="mb-2"><strong>{{ comment.created_by.username }}</strong> | {{comment.sent_at }}</p>
+                        <p class="pl-5 font-semibold">{{ comment.content }}</p>
+                        {% if comment.file %}
+                            <p class="pl-5">File: <a href="{{ comment.file.url }}" class="p-1 rounded-xl bg-yellow-300 hover:bg-yellow-400">{{ comment.file.name }}</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <form method='post' action="." enctype="multipart/form-data" class="m-5 p-2 bg-blue-100 rounded-xl border-black border">
+            {% csrf_token %}
+
+            <div class="space-y-4">
+                <div class="mb-4">
+                    <label for="id_content" class="block text-xl">Content:</label>
+                    {{ form.content }}
+                </div>
+                <div class="mb-4">
+                    <label for="id_file" class="block text-xl">File:</label>
+                    {{ form.file }}
+                </div>
+            </div>
+
+            {% if form.errors or form.non_field_errors %}
+                <div class="mb-3 p-6 bg-red-100 rounded-xl">
+                    {% for field in form %}
+                        {{field.errors}}
+                    {% endfor %}
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <button class="mt-5 py-3 px-6 text-xl bg-sky-500 hover:bg-sky-700 rounded-xl text-white">Send</button>
+        </form>
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+{% endblock %}

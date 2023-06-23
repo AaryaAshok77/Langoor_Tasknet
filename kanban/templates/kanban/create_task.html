@@ -1,0 +1,68 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+    <script src="{% static 'js/custom.js' %}"></script>
+
+    <div class="p-6 bg-sky-100 rounded-xl">
+        <button onclick="goBack()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9 p-1 rounded-lg hover:bg-sky-100">
+                <path d="M9.195 18.44c1.25.713 2.805-.19 2.805-1.629v-2.34l6.945 3.968c1.25.714 2.805-.188 2.805-1.628V8.688c0-1.44-1.555-2.342-2.805-1.628L12 11.03v-2.34c0-1.44-1.555-2.343-2.805-1.629l-7.108 4.062c-1.26.72-1.26 2.536 0 3.256l7.108 4.061z" />
+            </svg>              
+        </button>
+        <h1 class="mb-6 text-4xl" style="font-family: Lucida Console;">{{ title }}</h1>
+        <form method="post" action=".">
+            {% csrf_token %}
+
+            <div class="space-y-4">
+                <div class="mb-4">
+                    <label for="id_project" class="block text-xl">Project: {{ form.project }}</label>
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_title" class="block text-xl">Title: {{ form.title }}</label>
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_description" class="block text-xl">Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_assigned_users" class="block text-xl">Assign To:</label>
+                    <div id="assigned-to-container">
+                        <!-- The dynamic checkboxes will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_status" class="block text-xl">Status: {{ form.status }}</label>
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_due_date" class="block text-xl">Due Date: {{ form.due_date }}</label>
+                </div>
+            </div>
+
+            {% if form.errors or form.non_field_errors %}
+                <div class="mb-3 p-6 bg-red-100 rounded-xl">
+                    {% for field in form %}
+                        {{ field.errors }}
+                    {% endfor %}
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <button class="py-4 px-8 text-lg bg-sky-500 hover:bg-sky-700 rounded-xl text-white">Submit</button>
+        </form>
+        <script>
+            function goBack() {
+                window.history.back();
+            }
+        </script>
+    </div>
+{% endblock %}

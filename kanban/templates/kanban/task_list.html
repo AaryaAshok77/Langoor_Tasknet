@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+<div class="mt-6 px-6 py-12 bg-sky-100 rounded-xl">
+    <button onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9 p-1 rounded-lg hover:bg-sky-100">
+            <path d="M9.195 18.44c1.25.713 2.805-.19 2.805-1.629v-2.34l6.945 3.968c1.25.714 2.805-.188 2.805-1.628V8.688c0-1.44-1.555-2.342-2.805-1.628L12 11.03v-2.34c0-1.44-1.555-2.343-2.805-1.629l-7.108 4.062c-1.26.72-1.26 2.536 0 3.256l7.108 4.061z" />
+        </svg>              
+    </button>
+    <h2 class="mb-12 text-3xl text-center font-serif">Tasks</h2>
+    <div class="mb-4 flex justify-start">
+        <form method="GET" action="{% url 'kanban:task_list' %}">
+            <input type="text" name="search" placeholder="Search..." class="ml-2 py-2 px-4 rounded-lg" value="{{ request.GET.search }}">
+            <select name="status" class="py-2 px-4 rounded-lg">
+                <option value="">All</option>
+                <option value="TODO" {% if selected_status == 'TODO' %}selected{% endif %}>To Do</option>
+                <option value="IN_PROGRESS" {% if selected_status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                <option value="DONE" {% if selected_status == 'DONE' %}selected{% endif %}>Done</option>
+            </select>
+            <button type="submit" class="ml-2 py-2 px-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white">Search</button>
+            <p class="p-2"></p>
+            <label for="sort_by" class="mr-2">Sort by:</label>
+            <select name="sort_by" id="sort_by" class="py-2 px-4 rounded-lg">
+                <option value="created_date" {% if sort_by == 'created_date' %}selected{% endif %}>Created Date</option>
+                <option value="due_date" {% if sort_by == 'due_date' %}selected{% endif %}>Due Date</option>
+            </select>
+            <button type="submit" class="ml-2 py-2 px-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white">Sort</button>
+            <p class="p-2"></p>
+            {% if user.role == 'director' %}
+                <label for="assigned_to_me" class="ml-2 text-lg">Assigned to Me:</label>
+                <input type="checkbox" name="assigned_to_me" id="assigned_to_me" class="h-4 w-4" {% if assigned_to_me %}checked{% endif %}>
+                <button type="submit" class="mb-2 ml-2 py-2 px-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white">Apply</button>
+            {% endif %}
+        </form>
+    </div>
+    <div class="grid grid-cols-5 gap-10">
+        {% for task in tasks %}
+        <div {% if task.status == 'TODO' %} class="mb-4 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-md hover:shadow-blue-700 transition-all duration-300"
+            {% elif task.status == 'IN_PROGRESS' %} class="mb-4 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-md hover:shadow-yellow-700 transition-all duration-300"
+            {% else %} class="mb-4 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-md hover:shadow-green-700 transition-all duration-300" {% endif %}>
+            <a href="{% url 'kanban:task_detail' task.id %}">
+                <h3 class="mb-2 text-2xl font-semibold text-center">
+                    <span class="px-2 rounded-xl">{{ task.title }}</span>
+                </h3>
+                <h3 class="px-4 text-xl text-center">Status: 
+                    {% if task.status == 'TODO' %}
+                        <span class="px-2 font-semibold bg-blue-400 rounded-xl">To do</span>
+                    {% elif task.status == 'IN_PROGRESS' %}
+                        <span class="px-2 font-semibold bg-yellow-400 rounded-xl">In progress</span>
+                    {% else %}
+                        <span class="px-2 font-semibold bg-green-400 rounded-xl">Done</span>
+                    {% endif %}
+                </h3>
+                <h3 class="px-4 text-xl text-center">Description: <span class="text-gray-700" style=" display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ task.description }}</span></h3>
+                <h3 class="px-4 text-xl text-center">Due Date: <span class="font-semibold">{{ task.due_date }}</span></h3>
+            </a> 
+            <p class="pb-2"></p>
+        </div>
+        {% empty %}
+        <p class="text-xl px-6 text-center">No tasks available.</p>
+        {% endfor %}
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</div>
+{% endblock %}

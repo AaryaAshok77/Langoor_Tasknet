@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+    {{project.name}}
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-5 gap-6 p-5">
+    <div class="col-span-2">
+        <button onclick="goBack()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9 p-1 rounded-lg hover:bg-sky-100">
+                <path d="M9.195 18.44c1.25.713 2.805-.19 2.805-1.629v-2.34l6.945 3.968c1.25.714 2.805-.188 2.805-1.628V8.688c0-1.44-1.555-2.342-2.805-1.628L12 11.03v-2.34c0-1.44-1.555-2.343-2.805-1.629l-7.108 4.062c-1.26.72-1.26 2.536 0 3.256l7.108 4.061z" />
+            </svg>              
+        </button>
+        <h1 class="text-3xl font-bold mb-4">{{ project.name }}</h1>
+        <p class="px-3 text-gray-700 mb-4"><span class="font-semibold">Created by: </span>{{ project.creator.username }}</p>
+        <p class="px-3 text-gray-700 font-semibold">Description:</p> <p class="px-5 text-gray-700 mb-4">{{ project.description }}</p>
+        <p class="px-3 text-gray-700 mb-4"><span class="font-semibold">Start Date: </span>{{ project.start_date }}</p>
+        <p class="px-3 text-gray-700 mb-4"><span class="font-semibold">End Date: </span>{{ project.end_date }}</p>
+        <p class="px-3 text-gray-700"><span class="font-semibold">Ongoing Tasks: </span>{{ project.tasks.count }}</p>
+        <ul class="list-disc px-8 mb-4">
+            {% for task in project.tasks.all %}
+                <li class="text-gray-600"><a href="{% url 'kanban:task_detail' task.id %}" class="px-2 rounded-xl hover:bg-gray-200">{{ task.title }}</a></li>
+            {% endfor %}
+        </ul>
+
+        <p class="p-2"></p>
+        {% if request.user == project.creator or request.user.role == 'director' %}
+            <a href="{% url 'kanban:project_edit' project.id %}" class="m-1 p-3 bg-sky-500 text-white rounded-lg hover:bg-sky-600">Edit Project</a>
+            <a href="{% url 'kanban:project_delete' project.id %}" class="m-1 p-3 bg-red-500 text-white rounded-lg hover:bg-red-600">Delete</a>
+        {% endif %}
+
+    </div>
+    <div class="col-span-2">
+        <h2 class="mt-12 text-2xl font-bold mb-2 ">Assigned Users</h2>
+        <ul class="list-disc pl-6">
+            {% for user in project.assigned_users.all %}
+                <li class="text-gray-700">{{ user.username }}</li>
+            {% empty %}
+                <li class="text-gray-700">No assigned users.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+{% endblock %}
+

@@ -1,0 +1,82 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+<div class="mt-6 px-6 py-12 bg-sky-100 rounded-xl">
+    <button onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9 p-1 rounded-lg hover:bg-sky-100">
+            <path d="M9.195 18.44c1.25.713 2.805-.19 2.805-1.629v-2.34l6.945 3.968c1.25.714 2.805-.188 2.805-1.628V8.688c0-1.44-1.555-2.342-2.805-1.628L12 11.03v-2.34c0-1.44-1.555-2.343-2.805-1.629l-7.108 4.062c-1.26.72-1.26 2.536 0 3.256l7.108 4.061z" />
+        </svg>              
+    </button>
+    <h2 class="mb-12 text-3xl text-center font-serif">Projects</h2>
+    <div class="mb-4 flex justify-start">
+        <form method="GET" action="{% url 'kanban:project_list' %}">
+            <input type="text" name="search" placeholder="Search..." class="ml-2 py-2 px-4 rounded-lg">
+            <select name="status" class="py-2 px-4 rounded-lg">
+                <option value="">All</option>
+                <option value="ONGOING" {% if selected_status == 'ONGOING' %}selected{% endif %}>Ongoing</option>
+                <option value="COMPLETED" {% if selected_status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                <option value="CANCELLED" {% if selected_status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+            </select>
+            <button type="submit" class="ml-2 py-2 px-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white">Search</button>
+            <p class="p-2"></p>
+            <label for="sort_by" class="mr-2">Sort by:</label>
+            <select name="sort_by" id="sort_by" class="py-2 px-4 rounded-lg">
+                <option value="start_date" {% if sort_by == 'start_date' %}selected{% endif %}>Start Date</option>
+                <option value="end_date" {% if sort_by == 'end_date' %}selected{% endif %}>End Date</option>
+            </select>
+            <button type="submit" class="ml-2 py-2 px-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white">Sort</button>
+            <p class="p-2"></p>
+            {% if user.role == 'director' %}
+                <input type="checkbox" name="my_projects" id="my_projects" {% if my_projects %}checked{% endif %} class="mr-2">
+                <label for="my_projects" class="ml-2 text-lg">My Projects</label>
+                <button type="submit" class="ml-2 py-2 px-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white">Apply</button>
+        </form>
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-3 gap-10">
+        {% for project in projects %}
+            <div {% if project.status == 'COMPLETED' %} class="mb-4 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-lg hover:shadow-green-700 transition-all duration-300"
+                {% elif project.status == 'CANCELLED' %} class="mb-4 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-lg hover:shadow-red-700 transition-all duration-300"
+                {% else %} class="mb-4 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-lg hover:shadow-sky-700 transition-all duration-300"{% endif %}>
+                <a href="{% url 'kanban:project_detail' project.id %}">
+                    <h3 class="mb-2 text-2xl font-serif font-semibold text-center">
+                        <span class="px-2 rounded-xl">{{ project.name }}</span>
+                    </h3>
+                    {% if user.role == 'director' %}
+                        <h3 class="p-2 text-xl text-center font-semibold">Created by: {{ project.creator.username }}</h3>
+                    {% endif %}
+            
+                    {% if project.tasks.count == 0 or project.status == 'COMPLETED' or project.status == 'CANCELLED'%}
+                        <h3 class="px-4 text-xl text-center">Status: 
+                            {% if project.status == 'COMPLETED' %}
+                                <span class="px-2 font-semibold bg-green-400 rounded-xl">Completed</span>
+                            {% elif project.status == 'CANCELLED' %}
+                                <span class="px-2 font-semibold bg-red-400 rounded-xl">Cancelled</span>
+                            {% else %}
+                                <span class="px-2 font-semibold bg-green-400 rounded-xl">No Tasks</span>
+                            {% endif %}
+                        </h3>
+                    {% else %}
+                        <h3 class="px-4 text-xl text-center">Ongoing Tasks: <span class="font-semibold">{{ project.tasks.count }}</span></h3>
+                    {% endif %}
+                    <h3 class="px-4 text-xl text-center">Start Date: <span class="font-semibold">{{ project.start_date }}</span></h3>
+                    <h3 class="px-4 text-xl text-center">End Date: <span class="font-semibold">{{ project.end_date }}</span></h3>
+                </a> 
+                <p class="pb-2"></p>
+            </div>
+        {% empty %}
+        <p class="text-xl px-6 text-center">No projects available.</p>
+        {% endfor %}
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+    Delete Task
+{% endblock %}
+
+{% block content %}
+    <h2 class="p-2 text-2xl font-bold">Delete Task</h2>
+    <p class="py-2 px-4 text-xl">Are you sure you want to delete the task <span class="font-semibold">"{{ task.title }}"</span>?</p>
+    <form method="post" action="{% url 'kanban:task_delete' pk=task.pk %}" class="p-2">
+        {% csrf_token %}
+        <button type="submit" class="p-1 bg-red-500 font-semibold rounded-lg hover:bg-red-600">Delete</button>
+        <a href="{% url 'kanban:task_detail' pk=task.pk %}" class="p-1.5 bg-blue-500 font-semibold rounded-lg hover:bg-blue-600 ml-2">Cancel</a>
+    </form>
+{% endblock %}
+

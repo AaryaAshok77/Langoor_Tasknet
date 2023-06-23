@@ -1,0 +1,209 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+Kanban Board
+{% endblock %}
+
+{% block content %}
+<body>
+    <div class="mt-6 px-6 py-12 bg-sky-100 rounded-xl">
+        <button onclick="goBack()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9 p-1 rounded-lg hover:bg-sky-100">
+                <path d="M9.195 18.44c1.25.713 2.805-.19 2.805-1.629v-2.34l6.945 3.968c1.25.714 2.805-.188 2.805-1.628V8.688c0-1.44-1.555-2.342-2.805-1.628L12 11.03v-2.34c0-1.44-1.555-2.343-2.805-1.629l-7.108 4.062c-1.26.72-1.26 2.536 0 3.256l7.108 4.061z" />
+            </svg>              
+        </button>
+        <h2 class="mb-12 text-4xl text-center font-serif">Kanban Board</h2>
+        <div class="mb-4 flex justify-start">
+            <form method="GET" action="{% url 'kanban:board' %}">
+                <input type="text" name="search" placeholder="Search Project..." class="ml-2 py-2 px-4 rounded-lg">
+                <button type="submit" class="ml-2 py-2 px-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white">Search</button>
+                <p class="p-2"></p>
+                <select name="status" class="py-2 px-4 ml-1 rounded-lg">
+                    <option value="">All</option>
+                    <option value="ONGOING" {% if selected_status == 'ONGOING' %}selected{% endif %}>Ongoing</option>
+                    <option value="COMPLETED" {% if selected_status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                    <option value="CANCELLED" {% if selected_status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                </select>
+                <label for="assigned_only" class="p-2 ml-1 bg-white rounded-xl">
+                    <input type="checkbox" id="assigned_only" name="assigned_only" class="h-4 w-4" {% if assigned_only %}checked{% endif %}>
+                    <span class="ml-2 text-lg">Assigned to Me</span>
+                </label>
+                <button type="submit" class="ml-2 py-2 px-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white">Filter</button>
+            </form>
+        </div>
+        {% for project in projects %}
+            <div {% if project.status == 'COMPLETED' %}class="col-span-1 bg-green-300 rounded-xl mb-5 p-5 hover:bg-green-400 hover:shadow-lg hover:shadow-black transition-all duration-300"
+                {% elif project.status == 'CANCELLED' %}class="col-span-1 bg-red-300 rounded-xl mb-5 p-5 hover:bg-red-400 hover:shadow-lg hover:shadow-black transition-all duration-300"
+                {% else %}class="col-span-1 bg-sky-200 rounded-xl mb-5 p-5 hover:bg-sky-300 hover:shadow-lg hover:shadow-black transition-all duration-300"{% endif %}>
+                {% if request.user == task.created_by  or user.role == 'director' or request.user == task.project.creator %}
+                    <a href="{% url 'kanban:project_detail' project.id %}">
+                        <h3 class="mb-2 text-2xl font-serif font-semibold">
+                            <span {% if project.status == 'COMPLETED' %}class="p-2 hover:bg-green-500 rounded-xl transition-all"{% elif project.status == 'CANCELLED' %}class="p-2 hover:bg-red-500 rounded-xl transition-all"{% else %}class="p-2 hover:bg-sky-500 rounded-xl transition-all"{% endif %}>{{ project.name }}</span>
+                        </h3>
+                    </a>
+                {% else %}
+                    <h3 class="mb-2 text-2xl font-serif font-semibold">
+                        <span class="px-1">{{ project.name }}</span>
+                    </h3>
+                {% endif %}
+                <h3 class="px-4 text-xl">Start Date: {{ project.start_date }}</h3>
+                <h3 class="px-4 text-xl">End Date: {{ project.end_date }}</h3>
+                <h3 class="px-4 text-xl">Status: 
+                    {% if project.status == 'COMPLETED' %}
+                        <span class="px-2 font-semibold bg-green-400 rounded-xl">Completed</span>
+                    {% elif project.status == 'CANCELLED' %}
+                        <span class="px-2 font-semibold bg-red-400 rounded-xl">Cancelled</span>
+                    {% else %}
+                        <span class="px-2 font-semibold">Ongoing</span>
+                    {% endif %}
+                </h3>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-1 bg-sky-400 rounded-2xl border-gray-400 hover:shadow-md hover:shadow-black transition-all duration-300">
+                        <h2 class="text-3xl font-serif text-sky-800 text-center">To Do</h2>
+                        {% with flag_todo=False %}
+                            {% for task in tasks %}
+                                {% if task.status == 'TODO' and task.project_id == project.id %}
+                                    {% with flag_todo=True %}
+                                        <div {% if request.user in task.assigned_to.all or request.user.role == 'director' or request.user == task.project.creator %} class="task m-2 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-md hover:shadow-sky-700 transition-all duration-300"
+                                            {% else %} class="task m-2 bg-sky-200 rounded-xl" {%endif%}>
+                                            <a {% if request.user in task.assigned_to.all or request.user.role == 'director' or request.user == task.project.creator %}href="{% url 'kanban:task_detail' task.id %}"{% endif %}>
+                                                {% if request.user in task.assigned_to.all %}
+                                                    <h3 class="text-lg px-6 font-semibold text-green-600">Assigned to you!</h3>
+                                                {% else %}
+                                                    <h3 class="text-lg px-6 font-semibold text-yellow-600">
+                                                        Assigned to:
+                                                        {% for assigned_user in task.assigned_to.all %}
+                                                            {{ assigned_user.username }}{% if not forloop.last %}, {% else %}.{% endif %}
+                                                        {% endfor %}
+                                                    </h3>
+                                                {% endif %}
+                                                <h3 class="text-lg px-6 font-bold">{{ task.title }}</h3>
+                                                <p class="px-8" style=" display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ task.description }}</p>
+                                                <p class="px-8">Due Date: <span class="px-1 bg-sky-100 rounded-lg">{{ task.due_date }}</span></p>
+                                            </a>
+                                            {% if request.user in task.assigned_to.all or request.user == task.created_by  or request.user.role == 'director' or request.user == task.project.creator %}
+                                                <form method="POST" action="{% url 'kanban:update_task_status' task.id %}">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="m-3 px-2 rounded-lg hover:bg-gray-200 transition-all">
+                                                        <option value="TODO" {% if task.status == 'TODO' %}selected{% endif %}>To Do</option>
+                                                        <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                                                        <option value="DONE" {% if task.status == 'DONE' %}selected{% endif %}>Done</option>
+                                                    </select>
+                                                    <button type="submit" class="px-2 bg-sky-500 rounded-lg hover:bg-sky-600 transition-all">Update Status</button>
+                                                </form>
+                                            {% else %}
+                                                <p class="py-1"></p>
+                                            {% endif %}
+                                        </div>
+                                    {% endwith %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if not flag_todo %}
+                                <p class="text-xl px-6 text-center">No more tasks!!</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="col-span-1 bg-sky-400 rounded-2xl border-gray-400 hover:shadow-md hover:shadow-black transition-all duration-300">
+                        <h2 class="text-3xl font-serif text-sky-800 text-center">In Progress</h2>
+                        {% with flag_in_progress=False %}
+                            {% for task in tasks %}
+                                {% if task.status == 'IN_PROGRESS' and task.project_id == project.id %}
+                                    {% with flag_in_progress=True %}
+                                    <div {% if request.user in task.assigned_to.all or request.user.role == 'director' or request.user == task.project.creator %} class="task m-2 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-md hover:shadow-sky-700 transition-all duration-300"
+                                        {% else %} class="task m-2 bg-sky-200 rounded-xl" {%endif%}>
+                                            <a {% if request.user in task.assigned_to.all or request.user.role == 'director' or request.user == task.project.creator %}href="{% url 'kanban:task_detail' task.id %}"{% endif %}>
+                                                {% if request.user in task.assigned_to.all %}
+                                                    <h3 class="text-lg px-6 font-semibold text-green-600">Assigned to you!</h3>
+                                                {% else %}
+                                                    <h3 class="text-lg px-6 font-semibold text-yellow-600">
+                                                        Assigned to:
+                                                        {% for assigned_user in task.assigned_to.all %}
+                                                            {{ assigned_user.username }}{% if not forloop.last %}, {% else %}.{% endif %}
+                                                        {% endfor %}
+                                                    </h3>
+                                                {% endif %}
+                                                <h3 class="text-lg px-6 font-bold">{{ task.title }}</h3>
+                                                <p class="px-8" style=" display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ task.description }}</p>
+                                                <p class="px-8">Due Date: <span class="px-1 bg-sky-100 rounded-lg">{{ task.due_date }}</span></p>
+                                            </a>
+                                            {% if request.user in task.assigned_to.all or request.user == task.created_by  or request.user.role == 'director' or request.user == task.project.creator %}
+                                                <form method="POST" action="{% url 'kanban:update_task_status' task.id %}">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="m-3 px-2 rounded-lg hover:bg-gray-200 transition-all">
+                                                        <option value="TODO" {% if task.status == 'TODO' %}selected{% endif %}>To Do</option>
+                                                        <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                                                        <option value="DONE" {% if task.status == 'DONE' %}selected{% endif %}>Done</option>
+                                                    </select>
+                                                    <button type="submit" class="px-2 bg-sky-500 rounded-lg hover:bg-sky-600 transition-all">Update Status</button>
+                                                </form>
+                                            {% else %}
+                                                <p class="py-1"></p>
+                                            {% endif %}
+                                        </div>
+                                    {% endwith %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if not flag_in_progress %}
+                                <p class="text-xl px-6 text-center">No more tasks!!</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="col-span-1 bg-sky-400 rounded-2xl border-gray-400 hover:shadow-md hover:shadow-black transition-all duration-300">
+                        <h2 class="text-3xl font-serif text-sky-800 text-center">Done</h2>
+                        {% with flag_done=False %}
+                            {% for task in tasks %}
+                                {% if task.status == 'DONE' and task.project_id == project.id %}
+                                    {% with flag_done=True %}
+                                    <div {% if request.user in task.assigned_to.all or request.user.role == 'director' or request.user == task.project.creator %} class="task m-2 bg-sky-200 rounded-xl hover:bg-sky-300 hover:shadow-md hover:shadow-sky-700 transition-all duration-300"
+                                        {% else %} class="task m-2 bg-sky-200 rounded-xl" {%endif%}>
+                                            <a {% if request.user in task.assigned_to.all or request.user.role == 'director' or request.user == task.project.creator %}href="{% url 'kanban:task_detail' task.id %}"{% endif %}>
+                                                {% if request.user in task.assigned_to.all %}
+                                                    <h3 class="text-lg px-6 font-semibold text-green-600">Assigned to you!</h3>
+                                                {% else %}
+                                                    <h3 class="text-lg px-6 font-semibold text-yellow-600">
+                                                        Assigned to:
+                                                        {% for assigned_user in task.assigned_to.all %}
+                                                            {{ assigned_user.username }}{% if not forloop.last %}, {% else %}.{% endif %}
+                                                        {% endfor %}
+                                                    </h3>
+                                                {% endif %}
+                                                <h3 class="text-lg px-6 font-bold">{{ task.title }}</h3>
+                                                <p class="px-8" style=" display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ task.description }}</p>
+                                                <p class="px-8">Due Date: <span class="px-1 bg-sky-100 rounded-lg">{{ task.due_date }}</span></p>
+                                            </a>
+                                            {% if request.user in task.assigned_to.all or request.user == task.created_by  or request.user.role == 'director' or request.user == task.project.creator %}
+                                                <form method="POST" action="{% url 'kanban:update_task_status' task.id %}">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="m-3 px-2 rounded-lg hover:bg-gray-200 transition-all">
+                                                        <option value="TODO" {% if task.status == 'TODO' %}selected{% endif %}>To Do</option>
+                                                        <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                                                        <option value="DONE" {% if task.status == 'DONE' %}selected{% endif %}>Done</option>
+                                                    </select>
+                                                    <button type="submit" class="px-2 bg-sky-500 rounded-lg hover:bg-sky-600 transition-all">Update Status</button>
+                                                </form>
+                                            {% else %}
+                                                <p class="py-1"></p>
+                                            {% endif %}
+                                        </div>
+                                    {% endwith %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if not flag_done %}
+                                <p class="text-xl px-6 text-center">No more tasks!!</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+                <p class="py-5"></p>
+            </div>
+        {% empty %}
+            <p class="text-xl px-6">No projects available.</p>
+        {% endfor %}
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+{% endblock %}

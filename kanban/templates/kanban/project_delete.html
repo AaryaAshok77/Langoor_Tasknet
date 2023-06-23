@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+    Delete Project
+{% endblock %}
+
+{% block content %}
+    <h2 class="p-2 text-2xl font-bold">Delete Project</h2>
+    <p class="py-2 px-4 text-xl">Are you sure you want to delete the project <span class="font-semibold">"{{ project.name }}"</span>?</p>
+    <form method="post" action="{% url 'kanban:project_delete' pk=project.id %}" class="p-2">
+        {% csrf_token %}
+        <button type="submit" class="p-1 bg-red-500 font-semibold rounded-xl hover:bg-red-600">Delete</button>
+        <a href="{% url 'kanban:project_detail' pk=project.id %}" class="p-1.5 bg-blue-500 font-semibold rounded-xl hover:bg-blue-600 ml-3">Cancel</a>
+    </form>
+{% endblock %}
+
