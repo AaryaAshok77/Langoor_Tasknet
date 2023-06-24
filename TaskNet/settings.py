@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-f)o%6dhm1tzz(^hcj(io5r9tu2g2g_hs*%_3u&k^v7(4bb#=-$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['16.171.18.94']
+ALLOWED_HOSTS = ['16.171.18.94','127.0.0.1']
 
 
 # Application definition
@@ -138,7 +138,7 @@ AUTH_USER_MODEL = 'core.CustomUser'
 # Redirect after login
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/index'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/'
 
 # Attach Files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
