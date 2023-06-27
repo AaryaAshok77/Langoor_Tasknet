@@ -1,13 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.core.files.storage import  default_storage
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib import messages
 
 from .models import Task, Project
-from conversation.models import Comment, Conversation
 from .forms import NewProjectForm, NewTaskForm
+from core.models import CustomUser
+from conversation.models import Comment, Conversation
+from conversation.forms import CommentForm
+
 
 @login_required
 def board(request):
@@ -191,8 +194,60 @@ def task_detail(request, pk):
     if request.user != task.created_by and request.user != task.project.creator and request.user not in task.assigned_to.all() and request.user.role != 'director':
         return redirect('core:index')
 
+    conversation = Conversation.objects.filter(task=task).filter(members__in=[request.user.id]).first()
+
+    if conversation:
+        comments = conversation.comments.order_by('-sent_at')
+
+        paginator = Paginator(comments, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        if request.method == 'POST':
+            form = CommentForm(request.POST, request.FILES)  # Include request.FILES for file uploads
+            if form.is_valid():
+                conversation_comment = form.save(commit=False)
+                conversation_comment.conversation = conversation
+                conversation_comment.created_by = request.user
+                conversation_comment.save()
+
+                conversation.save()
+
+                return redirect('kanban:task_detail', pk=pk)
+
+        else:
+            form = CommentForm()
+    else:
+        if request.method == 'POST':
+            form = CommentForm(request.POST, request.FILES)  # Include request.FILES for file uploads
+
+            if form.is_valid():
+                conversation = Conversation.objects.create(task=task)
+                conversation.members.add(*task.assigned_to.all().values_list('id', flat=True))
+                conversation.members.add(task.created_by)
+                directors = CustomUser.objects.filter(role='director')
+                conversation.members.add(*directors)
+                conversation.save()
+
+                conversation_comment = form.save(commit=False)
+                conversation_comment.conversation = conversation
+                conversation_comment.created_by = request.user
+                conversation_comment.save()
+
+                return redirect('kanban:task_detail', pk=pk)
+            
+        else:
+            form = CommentForm()
+
+        comments = []
+        page_obj = None
+
     context = {
         'task': task,
+        'conversation': conversation,
+        'comments': comments,
+        'page_obj': page_obj,
+        'form': form,
     }
 
     return render(request, 'kanban/task_detail.html', context)

@@ -12,9 +12,9 @@ Conversation
             </svg>              
         </button>
         <h1 class="mb-6 text-4xl text-center" style="font-family: Lucida Console;">Conversation: <a href="{% url 'kanban:task_detail' conversation.task.id %}" class="p-1 rounded-xl hover:bg-sky-200">{{conversation.task.title}}</a></h1>
-        <div class="space-y-6">
+        <div class="space-y-6 p-2 bg-sky-200 rounded-xl" style="max-height: 500px; overflow-y: auto;">
             {% for comment in conversation.comments.all %}
-                <div class="p-6 {% if comment.created_by == request.user %}bg-sky-400 mr-40 {% else %}bg-sky-200 ml-40 {% endif %}rounded-xl" style="box-shadow: 5px 5px 10px #8f8f8f;">
+                <div class="p-6 shadow-md {% if comment.created_by == request.user %}bg-sky-400 shadow-sky-500 mr-40 {% else %}bg-sky-200 shadow-sky-300 ml-40 {% endif %}rounded-xl">
                     <div>
                         <p class="mb-2"><strong>{{ comment.created_by.username }}</strong> | {{comment.sent_at }}</p>
                         <p class="pl-5 font-semibold">{{ comment.content }}</p>
@@ -56,5 +56,9 @@ Conversation
         function goBack() {
             window.history.back();
         }
+
+        // Scroll to the bottom of the comments div
+        const commentsDiv = document.querySelector(".space-y-6");
+        commentsDiv.scrollTop = commentsDiv.scrollHeight;
     </script>
 {% endblock %}

@@ -24,12 +24,6 @@
             {% endfor %}
         </ul>
 
-        <p class="p-2"></p>
-        {% if request.user == project.creator or request.user.role == 'director' %}
-            <a href="{% url 'kanban:project_edit' project.id %}" class="m-1 p-3 bg-sky-500 text-white rounded-lg hover:bg-sky-600">Edit Project</a>
-            <a href="{% url 'kanban:project_delete' project.id %}" class="m-1 p-3 bg-red-500 text-white rounded-lg hover:bg-red-600">Delete</a>
-        {% endif %}
-
     </div>
     <div class="col-span-2">
         <h2 class="mt-12 text-2xl font-bold mb-2 ">Assigned Users</h2>
@@ -40,6 +34,11 @@
                 <li class="text-gray-700">No assigned users.</li>
             {% endfor %}
         </ul>
+        <p class="p-2"></p>
+        {% if request.user == project.creator or request.user.role == 'director' %}
+            <a href="{% url 'kanban:project_edit' project.id %}" class="m-1 p-3 bg-sky-500 text-white rounded-lg hover:bg-sky-600">Edit Project</a>
+            <a href="{% url 'kanban:project_delete' project.id %}" class="m-1 p-3 bg-red-500 text-white rounded-lg hover:bg-red-600">Delete</a>
+        {% endif %}
     </div>
 </div>
 <script>
