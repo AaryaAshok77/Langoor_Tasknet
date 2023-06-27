@@ -39,7 +39,12 @@ jobs:
         run: |
           # Replace "YOUR_INSTANCE_IP" with the actual IP address of your EC2 instance
           # Replace "/path/to/destination" with the actual destination path on your EC2 instance
-          scp -i ~/.ssh/TaskNetKey.pem -r * ec2-user@65.2.190.111:/home/ubuntu/Langoor_Tasknet
+          scp -i TaskNetKey.pem -r * ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/path/to/destination
+
+      - name: SSH into EC2 instance
+        run: |
+          # Replace "YOUR_INSTANCE_IP" with the actual IP address of your EC2 instance
+          ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com
 
       - name: Restart Apache
         run: sudo service apache2 restart
