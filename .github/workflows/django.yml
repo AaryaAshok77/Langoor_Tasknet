@@ -33,7 +33,6 @@ jobs:
 
       - name: Run migrations
         run: |
-          cd TaskNet
           python manage.py makemigrations
           python manage.py migrate
 
