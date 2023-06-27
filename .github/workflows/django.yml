@@ -27,26 +27,26 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd Langoor_Tasknet/Langoor_Tasknet
+          cd TaskNet/TaskNet
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
       - name: Run migrations
         run: |
-          cd Langoor_Tasknet/Langoor_Tasknet
+          cd TaskNet/TaskNet
           python manage.py makemigrations
           python manage.py migrate
 
       - name: Collect static files
         run: |
-          cd Langoor_Tasknet/Langoor_Tasknet
+          cd TaskNet/TaskNet
           python manage.py collectstatic
 
       - name: Deploy code to EC2
         run: |
           # Replace "YOUR_INSTANCE_IP" with the actual IP address of your EC2 instance
           # Replace "/path/to/destination" with the actual destination path on your EC2 instance
-          scp -i TaskNetKey.pem -r Langoor_Tasknet/Langoor_Tasknet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/path/to/destination
+          scp -i TaskNetKey.pem -r TaskNet/TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/path/to/destination
 
       - name: SSH into EC2 instance
         run: |
