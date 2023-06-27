@@ -36,10 +36,6 @@ jobs:
           python manage.py makemigrations
           python manage.py migrate
 
-      - name: Collect static files
-        run: |
-          python manage.py collectstatic
-
       - name: Deploy code to EC2
         run: |
           scp -i TaskNetKey.pem -r TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/path/to/destination
