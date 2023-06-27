@@ -23,12 +23,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.x
+          python-version: 3.10
 
       - name: Install dependencies
         run: |
           cd TaskNet
           python -m pip install --upgrade pip
+          pip install django
 
       - name: Run migrations
         run: |
@@ -41,13 +42,10 @@ jobs:
 
       - name: Deploy code to EC2
         run: |
-          # Replace "YOUR_INSTANCE_IP" with the actual IP address of your EC2 instance
-          # Replace "/path/to/destination" with the actual destination path on your EC2 instance
           scp -i TaskNetKey.pem -r TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/path/to/destination
 
       - name: SSH into EC2 instance
         run: |
-          # Replace "YOUR_INSTANCE_IP" with the actual IP address of your EC2 instance
           ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com
 
       - name: Restart Apache
