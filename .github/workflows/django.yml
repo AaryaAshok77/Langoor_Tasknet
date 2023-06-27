@@ -32,13 +32,11 @@ jobs:
 
       - name: Run migrations
         run: |
-          cd TaskNet
           python manage.py makemigrations
           python manage.py migrate
 
       - name: Collect static files
         run: |
-          cd TaskNet
           python manage.py collectstatic
 
       - name: Deploy code to EC2
