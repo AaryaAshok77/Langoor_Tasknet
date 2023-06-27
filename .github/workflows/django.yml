@@ -33,7 +33,7 @@ jobs:
 
       - name: Collect static files
         run: |
-          python manage.py collectstatic
+          sudo python manage.py collectstatic
 
       - name: Deploy code to EC2
         run: |
