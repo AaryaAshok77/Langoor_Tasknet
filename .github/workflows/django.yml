@@ -35,5 +35,11 @@ jobs:
         run: |
           python manage.py collectstatic
 
+      - name: Deploy code to EC2
+        run: |
+          # Replace "YOUR_INSTANCE_IP" with the actual IP address of your EC2 instance
+          # Replace "/path/to/destination" with the actual destination path on your EC2 instance
+          scp -i ~/.ssh/TaskNetKey.pem -r * ec2-user@65.2.190.111:/home/ubuntu/Langoor_Tasknet
+
       - name: Restart Apache
         run: sudo service apache2 restart
