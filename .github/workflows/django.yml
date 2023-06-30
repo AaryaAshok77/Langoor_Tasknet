@@ -40,12 +40,10 @@ jobs:
         run: |
           scp -i TaskNetKey.pem -r TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/home/ubuntu/Langoor_Tasknet
 
-      - name: SSH into EC2 instance
+      - name: SSH into EC2 instance and restart Apache
         run: |
-          - name: SSH into EC2 instance
-            run: |
-              ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com 'sudo service apache2 restart'
+          ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com 'sudo service apache2 restart'
 
-      - name: Restart Apache
+      - name: Run Django development server
         run: |
-          sudo service apache2 restart
+          ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com 'cd /home/ubuntu/Langoor_Tasknet && python manage.py runserver 0.0.0.0:8000'
