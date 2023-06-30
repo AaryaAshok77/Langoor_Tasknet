@@ -36,16 +36,17 @@ jobs:
           python manage.py makemigrations
           python manage.py migrate
 
-      - name: Clear known_hosts file
-        run: ssh-keygen -R ec2-65-2-190-111.ap-south-1.compute.amazonaws.com
-
       - name: Deploy code to EC2
         run: |
+          echo "Copying files to EC2..."
           scp -i TaskNetKey.pem -r TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/home/ubuntu/Langoor_Tasknet
 
       - name: SSH into EC2 instance
         run: |
+          echo "SSH into EC2 instance..."
           ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com
 
       - name: Restart Apache
-        run: sudo service apache2 restart
+        run: |
+          echo "Restarting Apache..."
+          sudo service apache2 restart
