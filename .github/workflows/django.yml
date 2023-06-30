@@ -38,15 +38,14 @@ jobs:
 
       - name: Deploy code to EC2
         run: |
-          echo "Copying files to EC2..."
           scp -i TaskNetKey.pem -r TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/home/ubuntu/Langoor_Tasknet
 
       - name: SSH into EC2 instance
         run: |
-          echo "SSH into EC2 instance..."
-          ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com
+          - name: SSH into EC2 instance
+            run: |
+              ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com 'sudo service apache2 restart'
 
       - name: Restart Apache
         run: |
-          echo "Restarting Apache..."
           sudo service apache2 restart
