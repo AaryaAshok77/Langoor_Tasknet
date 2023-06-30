@@ -38,7 +38,7 @@ jobs:
 
       - name: Deploy code to EC2
         run: |
-          scp -i TaskNetKey.pem -r TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/home/ubuntu/Langoor_Tasknet
+          scp -o StrictHostKeyChecking=no -i TaskNetKey.pem -r TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/home/ubuntu/Langoor_Tasknet
 
       - name: SSH into EC2 instance
         run: |
