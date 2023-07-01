@@ -29,21 +29,12 @@ jobs:
         run: |
           cd TaskNet
           python -m pip install --upgrade pip
-          pip install django
-
-      - name: Run migrations
-        run: |
-          python manage.py makemigrations
-          python manage.py migrate
+          pip install -r requirements.txt
 
       - name: Deploy code to EC2
         run: |
           scp -i TaskNetKey.pem -r TaskNet/* ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com:/home/ubuntu/Langoor_Tasknet
 
-      - name: SSH into EC2 instance and restart Apache
+      - name: SSH into EC2 instance
         run: |
           ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com 'sudo service apache2 restart'
-
-      - name: Run Django development server
-        run: |
-          ssh -i TaskNetKey.pem ubuntu@ec2-65-2-190-111.ap-south-1.compute.amazonaws.com 'cd /home/ubuntu/Langoor_Tasknet && python manage.py runserver 0.0.0.0:8000'
