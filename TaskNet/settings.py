@@ -127,6 +127,7 @@ STATIC_ROOT = '/Users/aaryaashokk/Documents/Coding/VS Code/Langoor/TaskNet/stati
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'staticfiles'),
 ]
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 
 # Default primary key field type
