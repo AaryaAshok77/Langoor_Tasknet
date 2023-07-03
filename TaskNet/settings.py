@@ -81,17 +81,9 @@ WSGI_APPLICATION = 'TaskNet.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tasknet',
-        'HOST': 'tasknet-db.cib5xzxfomtc.ap-south-1.rds.amazonaws.com',
-        'USER': 'admin',
-        'PASSWORD': 'administratortasknet',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
