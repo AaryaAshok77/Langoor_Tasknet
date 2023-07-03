@@ -86,7 +86,7 @@ DATABASES = {
     #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
     'default': {
-        'ENGINE': 'djongo.db.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tasknet',
         'HOST': 'tasknet-db.cib5xzxfomtc.ap-south-1.rds.amazonaws.com',
         'USER': 'admin',
