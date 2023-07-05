@@ -7,8 +7,8 @@ After=network.target
 User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/TaskNet
-ExecStartPre=/bin/chown www-data:www-data /home/ubuntu/TaskNet/db.sqlite3
-ExecStartPre=/bin/chmod 664 /home/ubuntu/TaskNet/db.sqlite3
+ExecStartPre=/bin/chown -R ubuntu:www-data /home/ubuntu/TaskNet
+ExecStartPre=/bin/chmod -R 775 /home/ubuntu/TaskNet
 ExecStart=/home/ubuntu/env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ubuntu/TaskNet/TaskNet/TaskNet.sock TaskNet.wsgi:application
 
 [Install]
