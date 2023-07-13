@@ -225,6 +225,7 @@ def task_detail(request, pk):
                 conversation = Conversation.objects.create(task=task)
                 conversation.members.add(*task.assigned_to.all().values_list('id', flat=True))
                 conversation.members.add(task.created_by)
+                conversation.members.add(task.project.creator)
                 directors = CustomUser.objects.filter(role='director')
                 conversation.members.add(*directors)
                 conversation.save()

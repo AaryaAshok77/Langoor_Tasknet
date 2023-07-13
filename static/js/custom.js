@@ -17,8 +17,8 @@ function loadAssignedUsers(projectId) {
 
                 const label = document.createElement("label");
                 label.htmlFor = checkbox.id;
-                label.textContent = user.username;
-                label.style.fontSize = "1.25rem";
+                label.textContent = '(${user.role})';
+                label.style.fontSize = "5rem";
                 label.style.paddingLeft = "0.25rem";
 
                 const div = document.createElement("div");
