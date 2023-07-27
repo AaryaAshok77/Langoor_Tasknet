@@ -14,7 +14,7 @@
 
     <body>
         <nav class="px-6 py-3 flex justify-between items-center border-b border-grey-200 bg-white" style="position: sticky; top: 0;">
-            <a href="/" class="text-sky-800" style="font-size: 40px; font-family:Lucida Console;">TaskNet<h1 class="ml-7 text-xl text-black">{% if request.user.is_authenticated %}Hello, {{request.user.username}}{% endif %}</h1></a>
+            <a href="{% url 'kanban:board' %}" class="text-sky-800" style="font-size: 40px; font-family:Lucida Console;">TaskNet<h1 class="ml-7 text-xl text-black">{% if request.user.is_authenticated %}Hello, {{request.user.username}}{% endif %}</h1></a>
             {% if messages %}
                 <ul class="messages" style="padding-bottom:2%; font-weight: bold; font-size: x-large; color: red;">
                     {% for message in messages %}
