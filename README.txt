@@ -123,3 +123,7 @@ d2: Amber Gates
 d3: Alexandra Estes
 qa1: Rory Dixon
 qa2: Chanelle Bean
+
+sudo systemctl start nginx
+sudo systemctl status nginx
+sudo systemctl stop nginx
